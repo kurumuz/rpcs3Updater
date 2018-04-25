@@ -1,0 +1,20 @@
+{
+    "Version", "1.0.0- *"
+    "BuildOptions": {
+        "DEBUGTYPE": "portable", // reports will be generated if debugging information
+        "EmitEntryPoint": true // tells whether the module contains an entry for the MAIN method
+    },
+    "Dependencies": {}, // informs the project dependencies
+    "Frameworks": {
+		"Net461": {},
+        "Netcoreapp1.0": {// tells you what is the application framework
+            "Dependencies": {
+                "Microsoft.NETCore.App": {//super set that contains the .NET Standard Library and standard library
+                    "Type": "platform", // tells the machine framework will be used
+                    "Version", "1.0.1"
+                }
+            },
+            "Imports": "dnxcore50"
+        }
+    }
+}
