@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -21,6 +21,8 @@ namespace rpcs3Updater
 			{						                           		
 				var getjson = _get_json_data<RootObject>("https://update.rpcs3.net/?c=somecommit"); //get json data from rpcs3 commit api using newtonsoft.json library
 				string windowsurl = getjson.latest_build.windows.download;                          //get the latest build url from json
+			 	string windowsdate = getjson.latest_build.windows.datetime;
+			 	string prnumber = getjson.latest_build.pr;
 				Match sversionmatch = Regex.Match(windowsurl, @"/artifacts/rpcs3-([^:]+)_win64.7z"); //use regex to get the server version.
 				Match lversionmatch = Regex.Match(File.ReadLines("RPCS3.log").First() , @"RPCS3 ([^:]+) Alpha"); //use regex to get local version id of rpcs3
 				string lversion = lversionmatch.Groups[1].Value.Remove(lversionmatch.Groups[1].Value.Length - 1); //delete the last char of local version
@@ -31,12 +33,14 @@ namespace rpcs3Updater
 				}           
 				else
 				{
+					Console.WriteLine("Your current version: " + lversion);
 					Console.WriteLine("RPCS3 is outdated, latest version available is: " + sversion );  //print the up to date version
+					Console.WriteLine("Date: " + windowsdate);
+					Console.WriteLine("PR number: " + prnumber);
 					Console.WriteLine("Do you want to download?(Y/n)");
 					string answer = Console.ReadLine();
-					if (answer == "y")
-					{
-						File.Delete("rpcs3.exe");                                                          
+					if (answer == "y" || answer == "Y")
+					{                                                         
 						if (File.Exists("rpcs3Update.7z"))
 						{
 							File.Delete("rpcs3Update.7z");
@@ -53,7 +57,10 @@ namespace rpcs3Updater
 							}							
 						}						
 						Console.WriteLine(" ");
-						Console.WriteLine("File downloaded succesfully, extracting rpcs3.exe");						
+						if (percentage == 100)
+						{
+						Console.WriteLine("File downloaded succesfully, extracting rpcs3.exe");		
+						File.Move("rpcs3.exe", "rpcs3.exe.oldversion");				
 						try
 						{
 							ProcessStartInfo process = new ProcessStartInfo();
@@ -66,8 +73,10 @@ namespace rpcs3Updater
 						catch (System.Exception Ex) 
 						{								
 						}
-					}
+						File.Delete("rpcs3Update.7z");
+						}
 					Console.WriteLine("Done!");	
+					}
 				}							
 				Console.WriteLine("Press a key to close...");
 				Console.ReadKey();
